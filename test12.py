@@ -1,35 +1,38 @@
 import streamlit as st
-import requests  # Import the requests library for HTTP requests
-
+import socket
+ 
+# Server details
+SERVER_IP = "10.170.104.80"  # Replace with the actual server IP
+SERVER_PORT = 8080
+ 
 # Streamlit UI
-st.title("🔗 HTTP Client with Streamlit")
-
+st.title("🔗 Socket Client with Streamlit")
+ 
 # Text input fields
-user_name = st.text_input("Enter your name:")
-text_prompt = st.text_input("Enter your text prompt:")
-
-# Ngrok URL
-NGROK_URL = "http://1234abcd.ngrok.io/receive_data"  # Replace with your actual ngrok URL
-
+message1 = st.text_input("Enter first message:")
+message2 = st.text_input("Enter second message:")
+ 
 # Submit button
 if st.button("Send Message"):
-    if user_name.strip() and text_prompt.strip():
-        # Create the data payload
-        data = {
-            "name": user_name,
-            "text_prompt": text_prompt
-        }
-
+    if message1.strip() and message2.strip():
+        final_message = message1 + " " + message2  # Concatenate messages
+       
         try:
-            # Send a POST request to the ngrok endpoint
-            response = requests.post(NGROK_URL, json=data)
-            if response.status_code == 200:
-                st.success("✅ Message sent successfully!")
-                st.write(f"📤 Sent: Name - {user_name}, Text Prompt - {text_prompt}")
-            else:
-                st.error("⚠️ Failed to send message. Server responded with an error.")
-                
-        except requests.exceptions.RequestException as e:
-            st.error(f"⚠️ Connection error: {e}")
+            # Establish socket connection
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((SERVER_IP, SERVER_PORT))
+            st.success(f"✅ Connected to {SERVER_IP}:{SERVER_PORT}")
+           
+            # Send message to server
+            client_socket.send(final_message.encode())
+            st.write(f"📤 Sent: {final_message}")
+           
+            # Receive response from server
+            response = client_socket.recv(1024).decode()
+           
+           
+            client_socket.close()
+        except Exception as e:
+            st.error(f"⚠️ Error: {e}")
     else:
         st.warning("Please enter messages in both fields before submitting.")
