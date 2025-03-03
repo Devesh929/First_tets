@@ -2,7 +2,7 @@ import streamlit as st
 import socket
  
 # Server details
-SERVER_IP = "10.170.104.80"  # Replace with the actual server IP
+SERVER_IP = "192.168.1.228"  # Replace with the actual server IP
 SERVER_PORT = 8080
  
 # Streamlit UI
